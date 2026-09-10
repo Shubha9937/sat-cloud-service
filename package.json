@@ -1,0 +1,27 @@
+{
+  "name": "sat-cloud-service",
+  "version": "1.0.0",
+  "description": "AWS Cloud Service backend for SAT-CLI (API Gateway, Secrets Manager, Bedrock Credentials Handler)",
+  "main": "dist/handlers/credentials-handler.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "sat-cli",
+    "aws-lambda",
+    "secrets-manager",
+    "api-gateway",
+    "bedrock"
+  ],
+  "author": "Saturam",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.1123.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.0.0"
+  }
+}

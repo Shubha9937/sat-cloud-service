@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS SAM Template for SAT-Cloud-Service (API Gateway & Bedrock Credentials Handler)
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs20.x
+    MemorySize: 256
+
+Parameters:
+  SecretId:
+    Type: String
+    Description: Name or ARN of the AWS Secrets Manager secret holding Bedrock credentials.
+    Default: saturam-bedrock-credentials
+  ExpectedToken:
+    Type: String
+    Description: Optional Bearer token required for API authentication. Leave empty if no auth token is required.
+    Default: ""
+
+Resources:
+  CredentialsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: sat-credentials-handler
+      CodeUri: ./
+      Handler: dist/handlers/credentials-handler.handler
+      Environment:
+        Variables:
+          SECRET_ID: !Ref SecretId
+          EXPECTED_TOKEN: !Ref ExpectedToken
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretId}*'
+      Events:
+        GetCredentials:
+          Type: HttpApi
+          Properties:
+            Path: /credentials
+            Method: GET
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL to configure in SAT-CLI
+    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/credentials'
